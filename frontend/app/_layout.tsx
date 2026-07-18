@@ -4,7 +4,9 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
+import * as Notifications from 'expo-notifications';
 import { queryClient } from '@/lib/queryClient';
+import { registerForPushNotifications } from '@/lib/notifications';
 import { useSession } from '@/store/session';
 
 /** bootstrap 완료 후 닉네임 유무에 따라 온보딩/탭으로 라우팅 */
@@ -25,6 +27,29 @@ function useAuthGate() {
   }, [ready, nickname, segments, router]);
 }
 
+/** 닉네임 확정 후 푸시 토큰 등록 + 알림 탭 시 해당 게시물로 이동 */
+function usePushNotifications() {
+  const deviceId = useSession((s) => s.deviceId);
+  const nickname = useSession((s) => s.nickname);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (deviceId && nickname) {
+      registerForPushNotifications(deviceId);
+    }
+  }, [deviceId, nickname]);
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const postId = response.notification.request.content.data?.postId;
+      if (typeof postId === 'string') {
+        router.push(`/post/${postId}`);
+      }
+    });
+    return () => sub.remove();
+  }, [router]);
+}
+
 export default function RootLayout() {
   const ready = useSession((s) => s.ready);
   const bootstrap = useSession((s) => s.bootstrap);
@@ -34,6 +59,7 @@ export default function RootLayout() {
   }, [bootstrap]);
 
   useAuthGate();
+  usePushNotifications();
 
   if (!ready) {
     return (
