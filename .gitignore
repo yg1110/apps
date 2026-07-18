@@ -42,4 +42,9 @@ yarn-error.*
 frontend/ios
 frontend/android
 
+# Supabase CLI local
+backend/supabase/.temp/
+backend/supabase/.branches/
+backend/supabase/.env
+
 .claude 
