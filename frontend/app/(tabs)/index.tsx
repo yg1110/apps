@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/components/EmptyState';
 import { HabitCard } from '@/components/HabitCard';
 import { habitStatus, useCompletions, useHabits, useToggleToday } from '@/features/habits/hooks';
@@ -36,7 +36,16 @@ export default function HomeScreen() {
                 doneToday={doneToday}
                 current={current}
                 toggling={toggle.isPending && toggle.variables?.habitId === item.id}
-                onToggle={() => toggle.mutate({ habitId: item.id, done: doneToday })}
+                onToggle={async () => {
+                  const wasDone = doneToday;
+                  await toggle.mutateAsync({ habitId: item.id, done: wasDone });
+                  if (!wasDone) {
+                    Alert.alert('오늘 완료! 🎉', '인증을 피드에 공유할까요?', [
+                      { text: '다음에', style: 'cancel' },
+                      { text: '공유하기', onPress: () => router.push(`/share?habitId=${item.id}`) },
+                    ]);
+                  }
+                }}
                 onPress={() => router.push(`/habit/${item.id}`)}
               />
             );
