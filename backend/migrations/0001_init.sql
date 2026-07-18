@@ -63,7 +63,8 @@ create index if not exists comments_post_idx on public.comments(post_id, created
 -- ============================================================
 -- 2) 피드 조회 뷰 (닉네임 조인 + 댓글 수)
 -- ============================================================
-create or replace view public.feed_posts as
+-- security_invoker=on: 뷰가 조회자(anon)의 권한/RLS로 실행 (SECURITY DEFINER 경고 해소)
+create or replace view public.feed_posts with (security_invoker = on) as
 select
   p.id, p.owner_id, p.habit_name, p.streak_count, p.caption, p.image_url,
   p.day_key, p.created_at,
