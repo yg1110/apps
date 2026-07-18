@@ -1,11 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/store/session';
-import { createPost, fetchFeed, uploadPostImage, type CreatePostInput } from './api';
+import { createPost, fetchFeed, fetchPost, uploadPostImage, type CreatePostInput } from './api';
 
 export function useFeed() {
   return useQuery({
     queryKey: ['feed'],
     queryFn: () => fetchFeed(50),
+  });
+}
+
+export function usePost(id: string) {
+  return useQuery({
+    queryKey: ['post', id],
+    queryFn: () => fetchPost(id),
+    enabled: !!id,
   });
 }
 

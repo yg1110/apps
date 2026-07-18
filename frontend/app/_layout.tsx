@@ -55,6 +55,7 @@ export default function RootLayout() {
             options={{ presentation: 'modal', headerShown: true, title: '새 습관' }}
           />
           <Stack.Screen name="habit/[id]" options={{ headerShown: true, title: '' }} />
+          <Stack.Screen name="post/[id]" options={{ headerShown: true, title: '게시물' }} />
           <Stack.Screen
             name="share"
             options={{ presentation: 'modal', headerShown: true, title: '인증 공유' }}

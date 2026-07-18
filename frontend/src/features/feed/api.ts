@@ -42,6 +42,16 @@ export async function fetchFeed(limit = 50): Promise<FeedPost[]> {
   return (data as FeedRow[]).map(mapFeed);
 }
 
+export async function fetchPost(id: string): Promise<FeedPost | null> {
+  const { data, error } = await supabase
+    .from('feed_posts')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapFeed(data as FeedRow) : null;
+}
+
 /** base64 이미지를 post-images 버킷에 업로드하고 public URL 반환. */
 export async function uploadPostImage(deviceId: string, base64: string): Promise<string> {
   const path = `${deviceId}/${uuidv4()}.jpg`;
